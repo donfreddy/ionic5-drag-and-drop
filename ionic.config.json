@@ -1,5 +1,7 @@
 {
   "name": "devdacticDrag",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

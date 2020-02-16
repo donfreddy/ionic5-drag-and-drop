@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { DragulaService } from 'ng2-dragula';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -7,6 +9,84 @@ import { Component } from '@angular/core';
 })
 export class HomePage {
 
-  constructor() {}
+  q1 = [
+    { value: 'Acheter du lait', color: 'primary' },
+    { value: 'Rédiger un msg', color: 'primary' }
+  ];
+  q2 = [
+    { value: 'Planifier un prog', color: 'secondary' },
+    { value: 'Trouvez un sujet', color: 'secondary' }
+  ];
+  q3 = [
+    { value: 'Améliorez les pages', color: 'tertiary' },
+    { value: 'Nettoyer la maison', color: 'tertiary' }
+  ];
+  q4 = [
+    { value: 'Choses sans importance', color: 'warning' },
+    { value: 'Regardez Netflix', color: 'warning' }
+  ];
+
+  todo = { value: '', color: '' };
+  selectedOptions = 'q1';
+
+  constructor(private dragulaService: DragulaService, private toastController: ToastController) {
+    this.dragulaService.drag('bag')
+      .subscribe(({ name, el, source }) => {
+        el.setAttribute('color', 'danger');
+      });
+
+    this.dragulaService.removeModel('bag')
+      .subscribe(({ item }) => {
+        this.toastController.create({
+          message: ` ${item.value} a été supprimé `,
+          duration: 2000,
+          color: 'danger'
+        }).then(toast => toast.present());
+      });
+
+    this.dragulaService.dropModel('bag')
+      .subscribe(({ item }) => {
+        item['color'] = 'success';
+      });
+
+    this.dragulaService.createGroup('bag', {
+      removeOnSpill: true
+    });
+  }
+
+  addTodo() {
+    switch (this.selectedOptions) {
+      case 'q1':
+        this.todo.color = 'primary';
+        break;
+      case 'q2':
+        this.todo.color = 'secondary';
+        break;
+      case 'q3':
+        this.todo.color = 'tertiary';
+        break;
+      case 'q4':
+        this.todo.color = 'warning';
+        break;
+    }
+
+    if (this.todo.value != '') {
+      this[this.selectedOptions].push(this.todo);
+
+      this.toastController.create({
+        message: ` ${this.todo.value} a été ajouter `,
+        duration: 2000,
+        color: 'warning'
+      }).then(toast => toast.present());
+    } else {
+
+      this.toastController.create({
+        message: 'Veuillez saisir le nom de la tâche',
+        duration: 2000,
+        color: 'warning'
+      }).then(toast => toast.present());
+    }
+    this.todo = { value: '', color: '' };
+  }
 
 }
